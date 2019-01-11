@@ -4,8 +4,6 @@ using Machine.Specifications.Reporting.Model;
 
 using Spark;
 
-using Assembly = System.Reflection.Assembly;
-
 namespace Machine.Specifications.Reporting.Generation.Spark
 {
     public interface ISparkRenderer
@@ -25,7 +23,6 @@ namespace Machine.Specifications.Reporting.Generation.Spark
             var factory = new SparkViewEngineFactory();
 
             _engine = factory.CreateViewEngine();
-            _engine.LoadBatchCompilation(Assembly.Load(factory.TemplateAssembly));
 
             _report = new SparkViewDescriptor().AddTemplate(SparkViewEngineFactory.ReportTemplate);
             _index = new SparkViewDescriptor().AddTemplate(SparkViewEngineFactory.IndexTemplate);
