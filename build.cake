@@ -14,7 +14,7 @@ var version = "0.1.0";
 var versionNumber = "0.1.0";
 
 var artifacts = Directory("./artifacts");
-var solution = File("./src/Machine.Specifications.Reporting.sln");
+var solution = File("./Machine.Specifications.Reporting.sln");
 
 //////////////////////////////////////////////////////////////////////
 // TASKS
@@ -24,15 +24,7 @@ Task("Clean")
 {
     CleanDirectories("./src/**/bin");
     CleanDirectories("./src/**/obj");
-
-    if (DirectoryExists(artifacts))
-    {
-        DeleteDirectory(artifacts, new DeleteDirectorySettings 
-        {
-            Recursive = true,
-            Force = true
-        });
-    }
+    CleanDirectory(artifacts);
 });
 
 Task("Restore")
@@ -64,8 +56,8 @@ Task("Versioning")
 });
 
 Task("Build")
+    .IsDependentOn("Clean")
     .IsDependentOn("Versioning")
-    .IsDependentOn("Restore")
     .Does(() => 
 {
     CreateDirectory(artifacts);
@@ -84,12 +76,11 @@ Task("Test")
     .IsDependentOn("Build")
     .Does(() => 
 {
-    var projects = GetFiles("./src/**/*.Specs.csproj");
-
-    foreach (var project in projects)
+    DotNetCoreTest(solution, new DotNetCoreTestSettings
     {
-        DotNetCoreTest(project.FullPath);
-    }
+        Configuration = configuration,
+        NoBuild = true
+    });
 });
 
 Task("Package")
@@ -97,19 +88,14 @@ Task("Package")
     .IsDependentOn("Test")
     .Does(() => 
 {
-    var projects = GetFiles("./src/**/*.csproj");
-
-    foreach (var project in projects)
+    DotNetCorePack(solution, new DotNetCorePackSettings
     {
-        DotNetCorePack(project.FullPath, new DotNetCorePackSettings
-        {
-            Configuration = configuration,
-            OutputDirectory = artifacts,
-            NoBuild = true,
-            ArgumentCustomization = x => x
-                .Append("/p:Version={0}", version)
-        });
-    }
+        Configuration = configuration,
+        OutputDirectory = artifacts,
+        NoBuild = true,
+        ArgumentCustomization = x => x
+            .Append("/p:Version={0}", version)
+    });
 });
 
 Task("Publish")

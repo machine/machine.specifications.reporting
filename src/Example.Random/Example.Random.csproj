@@ -4,6 +4,7 @@
     <Version>0.1.0</Version>
     <TargetFrameworks>net452</TargetFrameworks>
     <IsPackable>false</IsPackable>
+    <IsTestProject>false</IsTestProject>
   </PropertyGroup>
 
   <ItemGroup>
