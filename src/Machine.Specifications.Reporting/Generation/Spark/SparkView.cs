@@ -1,5 +1,5 @@
 using System;
-using System.Web;
+using System.Text.Encodings.Web;
 
 using Machine.Specifications.Reporting.Model;
 
@@ -17,7 +17,7 @@ namespace Machine.Specifications.Reporting.Generation.Spark
 
         public string H(object value)
         {
-            return HttpUtility.HtmlEncode(Convert.ToString(value));
+            return HtmlEncoder.Default.Encode(Convert.ToString(value));
         }
 
         public static string Pluralize(string caption, int count)

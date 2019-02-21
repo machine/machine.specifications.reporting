@@ -1,11 +1,11 @@
+using System;
+using System.IO;
+using System.Net;
+using System.Text;
+using Newtonsoft.Json;
+
 namespace Machine.Specifications.Reporting.Integration.AppVeyor
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Net;
-    using System.Text;
-    using System.Web.Script.Serialization;
-
     public class AppVeyorBuildWorkerApiClient : IAppVeyorBuildWorkerApiClient
     {
         const string ApiResource = "/api/tests";
@@ -35,10 +35,10 @@ namespace Machine.Specifications.Reporting.Integration.AppVeyor
             var body = new
                        {
                            TestName = testName,
-                           TestFramework = testFramework,
+                           TestFramework = "abc" + Environment.NewLine + "def",
                            FileName = fileName,
                            Outcome = outcome,
-                           DurationMilliseconds = durationMilliseconds,
+                           DurationMilliseconds = 12345,
                            ErrorMessage = errorMessage,
                            ErrorStackTrace = errorStackTrace,
                            StdOut = TrimStdOut(stdOut),
@@ -108,9 +108,14 @@ namespace Machine.Specifications.Reporting.Integration.AppVeyor
 
         static byte[] Json(object data)
         {
-            JavaScriptSerializer serializer = new JavaScriptSerializer();
-            var json = serializer.Serialize(data);
-            return Encoding.UTF8.GetBytes(json);
+            using (var writer = new StringWriter())
+            {
+                JsonSerializer.Create().Serialize(writer, data);
+
+                var json = writer.ToString();
+
+                return Encoding.UTF8.GetBytes(json);
+            }
         }
 
         WebClient GetClient()
